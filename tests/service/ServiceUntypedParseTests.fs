@@ -39,7 +39,7 @@ let private (=>) (source: string) (expected: CompletionContext option) =
     match markerPos with
     | None -> failwithf "Marker '%s' was not found in the source code" Marker
     | Some markerPos ->
-        match parseSourceCode("C:\\test.fs", source) with
+        match parseSourceCode false ("C:\\test.fs", source) with
         | None -> failwith "No parse tree"
         | Some parseTree ->
             let actual = UntypedParseImpl.TryGetCompletionContext(markerPos, parseTree, lines.[Line.toZ markerPos.Line])
@@ -146,6 +146,26 @@ let foo7 = ()
           [ (1, ((15, 0), (15, 4))) ]
           [ (0, ((18, 0), (18, 2))) ]
           [ (0, ((21, 0), (21, 4))) ] ]
+
+[<Test>]
+let ``and!``() = 
+    let source = """
+let workflow = 
+    async {
+        let! x = Async.Sleep 1.
+        and! y = Async.Sleep 2.
+        return ()
+    }
+"""
+    let (SynModuleOrNamespace (_, _, _, decls, _, _, _, _)) = parseSourceCodeAndGetModuleFailError source
+    // let expected = SynExpr.App(_,_,_,SynExpr.CompExpr(false,_,SynExpr.LetOrUseBang(_,_,_,_,_,andbangs,_,_),_),_)
+    match decls with
+    | [SynModuleDecl.Let(false,[Binding(_,_,_,_,_,_,_,_,_,SynExpr.App(_,_,_,SynExpr.CompExpr(false,_,SynExpr.LetOrUseBang(_,_,_,_,_,andbangs,_,_),_),_),_,_)],_)] -> 
+        match andbangs with
+        | [] -> failwith "no and! detected in compexpr"
+        | [x] -> () // found the and!
+        | xs -> failwith "found too many andbangs"
+    | decls -> failwithf "and! not detected in\n%A" decls
 
 
 module TypeMemberRanges =
@@ -263,3 +283,5 @@ type T =
     new (x:int) = ()
 """
         getTypeMemberRange source |> shouldEqual [ (3, 4), (3, 20) ]
+
+        

@@ -3,7 +3,7 @@
 Contains commits from 32b124966 to d7018737c from dotnet/fsharp. Notable changes include:
 
 * lowered allocations for large strings and char arrays (notably source file texts)
-* improved support for byreflike rules with regards to type abbreviations
+* improved support for byref-like rules with regards to type abbreviations
 * better support for scopes in recursive modules
 * better location of .net core reference assemblies
 * lowered allocations for several internal compiler structures

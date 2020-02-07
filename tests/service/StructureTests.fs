@@ -40,7 +40,7 @@ let (=>) (source: string) (expectedRanges: (Range * Range) list) =
 
     let getRange (r: range) = (r.StartLine, r.StartColumn, r.EndLine, r.EndColumn)
 
-    let ast = parseSourceCode(fileName, source)
+    let ast = parseSourceCode false (fileName, source)
     try
         match ast with
         | Some tree ->

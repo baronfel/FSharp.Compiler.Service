@@ -14,7 +14,7 @@ let ``Visit type test`` () =
 
     let source = "123 :? int"
     let parseTree =
-        match parseSourceCode("C:\\test.fs", source) with
+        match parseSourceCode false ("C:\\test.fs", source) with
         | None -> failwith "No parse tree"
         | Some parseTree -> parseTree
 
